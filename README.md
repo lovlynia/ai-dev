@@ -123,4 +123,6 @@ I would move the data from CSV into PostgreSQL because it is better suited for l
 ### Adding a second agent
 I would only add a second agent if there was a specific task that the first agent could not handle effectively. If the existing agent can handle the researcher's questions reliably, adding another agent could make the system more complicated and potentially increase cost and latency.
 
+### A few risks 
+I would change how I check for SELECT in tools.py because it currently can possibly pass SELECTED. It hasn't been tested, but I should be correct since it only checks for the first six letters. 
 
