@@ -85,28 +85,42 @@ class Agent:
 
         #for loop used to go through all steps required 
         for step in range(MAX_STEPS):
-            response=self.llm.complete(messages) # calling llm 
+            response=self.llm.complete(messages) # calling llm - what to do
 
-            
+            #convert llm json response to python dict
             try:
                 parsed_response=json.loads(response)
             except json.JSONDecodeError as e:
                 raise ValueError(f"JSON error:{e}")
+            except Exception as e:
+                raise ValueError(f"LLM error:{e}")
 
+            #check whether llm requested a tool
             if "tool" in parsed_response:
-              found_key=parsed_response.get("tool")
-            
-            if found_key=="query_data":
-                load_sql=parsed_response.get("sql")
-                result=query_data(load_sql,self.con)
+              found_key=parsed_response.get("tool") #get name of tool requested
 
-                messages.append({
+              if found_key=="query_data":
+                  load_sql=parsed_response.get("sql") #extract sql query gen by llm
+              else:
+                  raise ValueError("Unknown tool requested")
+
+              if not isinstance(load_sql, str) or not load_sql.strip():
+                    raise ValueError("Tool call is missing a valid SQL query")
+
+              result=query_data(load_sql,self.con)
+
+              #add to database result so llm can get answer 
+              messages.append({
                     "role":"tool",
                     "content":json.dumps(result)
-                })
+                  })
 
+            #returning answer to user 
             if "answer" in parsed_response:
                 return parsed_response.get("answer")
+
+        raise RuntimeError("Maximum steps reached no answer acquired")
+
             
                 
             

@@ -59,8 +59,9 @@ def query_data(sql: str, con: sqlite3.Connection | None = None) -> List[list]:
          the agent loop can recover from it.
     """
 
+
      #step 1: checking if sql is empty or has a string 
-    if isinstance(sql,str)and sql.strip():
+    if isinstance(sql,str) or sql.strip():
         pass
     else:
         raise ValueError("Error: Invalid Input")
@@ -86,21 +87,22 @@ def query_data(sql: str, con: sqlite3.Connection | None = None) -> List[list]:
     if con is None: 
         raise ValueError("No database connection provided")
 
+    cursor=con.cursor() #moving cursor outside of try catch 
+
     try: 
+        
+        cursor.execute(sql)
 
-        with con.cursor() as cursor:
-            cursor.execute(sql)
+        #getting rows
+        rows=cursor.fetchall()
+        #getting list
+        list_rows=[list(row)for row in rows]
 
-            #getting rows
-            rows=cursor.fetchall()
-            #getting list
-            list_rows=[list(row)for row in rows]
-
-            #results returned 
-            return list_rows
+        #results returned 
+        return list_rows
             
     except sqlite3.Error as e:
-        print(f"Database Error:{e}")
+       print(f"Database Error:{e}")
 
 
     

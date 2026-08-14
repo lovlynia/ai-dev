@@ -38,7 +38,27 @@ def score_answer(answer: str, expected: str, kind: str) -> bool:
     a match -- e.g. should "37,888,285" match "37888285"? How do you detect a
     refusal without being fooled by an answer that just happens to contain a word?
     """
-    raise NotImplementedError("Implement score_answer (see TODO).")
+
+    #cleaning responses to check if they match 
+    answered= answer.lower().replace(",","").strip()
+    clean_expected= expected.lower().replace(",","").strip()
+
+    #step 2 evaluate the questions 
+    if kind=="value":
+        return clean_expected in answered
+
+    if kind=="refusal":
+        refusals=[
+            "cannot answer",
+            "answer not found",
+            "not enough information",
+            "answer cannot be made"
+        ]
+        return any(response in answered for response in refusals)
+
+    #unknown question return false 
+    return False
+
 
 
 def main() -> None:
