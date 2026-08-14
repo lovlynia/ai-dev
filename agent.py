@@ -61,7 +61,55 @@ class Agent:
           3. Add basic reliability: handle malformed JSON / tool errors, and
              retry the LLM call once before giving up.
         """
-        raise NotImplementedError("Implement the agent loop (see TODOs).")
+
+        #step 1: validate question 
+        if not isinstance(question,str) or not question.strip():
+            raise ValueError("Error: Invalid Input")
+
+        #step 2: build messages - with dictionary
+        messages=[
+            #system message-----
+            {
+                "role":"system",
+                "content":SYSTEM_PROMPT
+            },
+            #user message-----
+            {
+                "role":"user",
+                "content":question
+            }
+
+        ]
+
+        #step 3- self call llm and parse json
+
+        #for loop used to go through all steps required 
+        for step in range(MAX_STEPS):
+            response=self.llm.complete(messages) # calling llm 
+
+            
+            try:
+                parsed_response=json.loads(response)
+            except json.JSONDecodeError as e:
+                raise ValueError(f"JSON error:{e}")
+
+            if "tool" in parsed_response:
+              found_key=parsed_response.get("tool")
+            
+            if found_key=="query_data":
+                load_sql=parsed_response.get("sql")
+                result=query_data(load_sql,self.con)
+
+                messages.append({
+                    "role":"tool",
+                    "content":json.dumps(result)
+                })
+
+            if "answer" in parsed_response:
+                return parsed_response.get("answer")
+            
+                
+            
 
 
 if __name__ == "__main__":
