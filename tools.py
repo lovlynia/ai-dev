@@ -58,4 +58,16 @@ def query_data(sql: str, con: sqlite3.Connection | None = None) -> List[list]:
          Decide what `query_data` returns or raises on failure, and make sure
          the agent loop can recover from it.
     """
+
+     #step 1: checking if sql is empty or has a string 
+    if isinstance(sql,str)and sql.strip():
+        print("Valid: It is a string and is not empty ") # this is temporary 
+
+        #Empty spaces cleaned 
+        cleaned_sql=sql.strip()
+
+        if cleaned_sql.upper().startswith("SELECT"):
+            print("Success")
+    
+
     raise NotImplementedError("Implement query_data (see TODOs).")
