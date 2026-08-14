@@ -61,13 +61,46 @@ def query_data(sql: str, con: sqlite3.Connection | None = None) -> List[list]:
 
      #step 1: checking if sql is empty or has a string 
     if isinstance(sql,str)and sql.strip():
-        print("Valid: It is a string and is not empty ") # this is temporary 
+        pass
+    else:
+        raise ValueError("Error: Invalid Input")
 
-        #Empty spaces cleaned 
-        cleaned_sql=sql.strip()
+    #step 2: empty spaces cleaned 
+    cleaned_sql=sql.strip()
 
-        if cleaned_sql.upper().startswith("SELECT"):
-            print("Success")
+    #step 3: checking if SELECT
+    if cleaned_sql.upper().startswith("SELECT"):
+        pass
+    else:
+        raise ValueError("Only a single SELECT statement is allowed")
+
+
+    #step 4: checking for other queries - if semi appears at end of string
+    if ";" in cleaned_sql:
+        parts=cleaned_sql.split(";")
+        for part in parts[1:]:
+            if part.strip():
+                raise ValueError("Multiple SQL statements are not allowed")#if characters found multiple queries have been made after semi
+
+     #step 5: execute 
+    if con is None: 
+        raise ValueError("No database connection provided")
+
+    try: 
+
+        with con.cursor() as cursor:
+            cursor.execute(sql)
+
+            #getting rows
+            rows=cursor.fetchall()
+            #getting list
+            list_rows=[list(row)for row in rows]
+
+            #results returned 
+            return list_rows
+            
+    except sqlite3.Error as e:
+        print(f"Database Error:{e}")
+
+
     
-
-    raise NotImplementedError("Implement query_data (see TODOs).")
