@@ -108,4 +108,19 @@ simple beats clever and fragile.
 
 ## Production notes
 
-_(Your notes here.)_
+### Swapping `FakeLLM` for a real provider
+I would swap the `FakeLLM` for a real provider like OpenAI. I would probably keep `agent.py` intact and have a `RealLLM` function handle the API call. This would allow the agent to know how to act without making `agent.py` dependent on a specific provider.
+
+### Reliability, evaluation, and monitoring
+I would evaluate the LLM by using a structured data-analysis process. I would start by testing whether it correctly understands the dataset's columns and what information they contain, then ask it increasingly specific questions about the data. I would also test it with questions about information that does not exist in the dataset to make sure it does not make up answers. From there, I would refine the prompts and continue testing the agent to make sure it stays focused on helping with the research task.
+
+### Cost and latency
+Cost and latency would mainly come from the LLM consuming tokens and from making multiple LLM calls. One way to reduce this would be to use an open-source model locally when appropriate, or reduce the number of times the LLM needs to be called. Right now the agent is limited to four rounds, but if more prompts or steps are added, the cost and latency could increase.
+
+### Moving from CSV to PostgreSQL and deployment
+I would move the data from CSV into PostgreSQL because it is better suited for larger amounts of structured data and would make it easier to organize and query the data based on a researcher's needs. SQL would also allow the agent to work with a much larger dataset than the current CSV setup.
+
+### Adding a second agent
+I would only add a second agent if there was a specific task that the first agent could not handle effectively. If the existing agent can handle the researcher's questions reliably, adding another agent could make the system more complicated and potentially increase cost and latency.
+
+
